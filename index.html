@@ -52,8 +52,13 @@
 
   /* Presentes */
   .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
-  .toolbar input{flex:1 1 200px}
+  .toolbar #busca{flex:1 1 200px}
   .contador{font-size:12px; color:var(--muted); white-space:nowrap}
+  .filtro{display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600;
+          color:var(--vinho); cursor:pointer; user-select:none; white-space:nowrap;
+          padding:9px 12px; border:1px solid #E5B9C8; border-radius:10px; background:#fff}
+  .filtro:hover{background:var(--rosa)}
+  .filtro input{width:15px; height:15px; accent-color:var(--vinho); cursor:pointer; margin:0}
   input, button{font-family:'Quicksand',sans-serif}
   .campo{width:100%; padding:11px 12px; border:1px solid #E5B9C8; border-radius:10px; font-size:14px; font-weight:500; background:#fff; color:var(--texto)}
   .campo:focus{outline:none; border-color:var(--vinho); box-shadow:0 0 0 3px var(--rosa)}
@@ -62,6 +67,7 @@
   thead tr{background:var(--vinho); color:#fff}
   th{padding:11px 10px; font-weight:600; text-align:left}
   th.c{text-align:center}
+  th.colref{font-size:11.5px; line-height:1.25; font-weight:600}
   td{padding:11px 10px; border-top:1px solid var(--borda); vertical-align:middle}
   td.c{text-align:center}
   tr.taken{background:#FBF0F3}
@@ -113,7 +119,14 @@
   @media(max-width:560px){
     .panela{font-size:58px} .nomes{font-size:32px}
     th,td{padding:9px 7px; font-size:12.5px}
+    th.colref{font-size:10px; width:66px}
     th.hide,td.hide{display:none}
+    /* o cabecalho longo da coluna de link rouba largura: deixa o botao quebrar
+       em duas linhas para a tabela nao estourar a tela e cortar o "Vou presentear" */
+    .btn-mini{white-space:normal; padding:7px 8px; line-height:1.2}
+    thead th:last-child{width:74px}
+    .toolbar{gap:8px}
+    .filtro{flex:1 1 100%; justify-content:center; white-space:normal; font-size:12px}
   }
 </style>
 </head>
@@ -153,33 +166,11 @@
       <div class="cor"><span class="dot" style="background:#FFFFFF"></span><span>BRANCO</span></div>
       <div class="cor"><span class="dot" style="background:#EFE7DA"></span><span>OFF-WHITE</span></div>
       <div class="cor"><span class="dot" style="background:#C89B6B"></span><span>AMADEIRADO</span></div>
+      <div class="cor"><span class="dot" style="background:#6F4E37"></span><span>MARROM</span></div>
+      <div class="cor"><span class="dot" style="background:linear-gradient(135deg,#E8EBEC 0%,#B9BFC3 45%,#8E969B 60%,#D2D7D9 100%)"></span><span>INOX</span></div>
       <div class="cor"><span class="dot" style="background:#161616"></span><span>PRETO</span></div>
     </div>
     <div class="carinho">MAS QUALQUER PRESENTE SERÁ RECEBIDO COM MUITO CARINHO E AMOR! &#10084;</div>
-  </div>
-
-  <div class="sec-tit">&#127873; NOSSA LISTA DE PRESENTES</div>
-  <div class="sec-sub">Clique em "Vou presentear" para reservar um item &#128522;</div>
-
-  <div class="toolbar">
-    <input id="busca" class="campo" type="text" placeholder="Buscar presente..." oninput="renderGifts()">
-    <div class="contador" id="contador"></div>
-  </div>
-
-  <div class="lista">
-    <table>
-      <thead>
-        <tr>
-          <th>Presente</th>
-          <th class="c" style="width:50px">Link</th>
-          <th>Quem presenteará</th>
-          <th style="width:110px"></th>
-        </tr>
-      </thead>
-      <tbody id="giftbody">
-        <tr><td colspan="4" class="estado">Carregando presentes...</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <div class="rsvp card">
@@ -190,6 +181,31 @@
       <div id="sug" class="sug" style="display:none"></div>
     </div>
     <div id="grupo" class="grupo" style="display:none"></div>
+  </div>
+
+  <div class="sec-tit" style="margin-top:38px">&#127873; NOSSA LISTA DE PRESENTES</div>
+  <div class="sec-sub">Clique em "Vou presentear" para reservar um item &#128522;</div>
+
+  <div class="toolbar">
+    <input id="busca" class="campo" type="text" placeholder="Buscar presente..." oninput="renderGifts()">
+    <label class="filtro"><input type="checkbox" id="soDisponiveis" onchange="renderGifts()"> Só o que ainda não foi presenteado</label>
+    <div class="contador" id="contador"></div>
+  </div>
+
+  <div class="lista">
+    <table>
+      <thead>
+        <tr>
+          <th>Presente</th>
+          <th class="c colref" style="width:96px">Sugestão de Link para Referência</th>
+          <th>Quem presenteará</th>
+          <th style="width:110px"></th>
+        </tr>
+      </thead>
+      <tbody id="giftbody">
+        <tr><td colspan="4" class="estado">Carregando presentes...</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <footer id="footer"></footer>
@@ -230,12 +246,16 @@ async function loadGifts(){
 }
 function renderGifts(){
   const q = (document.getElementById('busca').value||'').toLowerCase();
+  const soDisp = document.getElementById('soDisponiveis').checked;
   const body = document.getElementById('giftbody');
-  const lista = gifts.filter(g => g.nome.toLowerCase().includes(q));
+  const lista = gifts.filter(g => g.nome.toLowerCase().includes(q) && (!soDisp || !g.reservado_por));
   const giftable = gifts.filter(g => g.reservado_por !== 'Já temos');
   const escolhidos = giftable.filter(g => g.reservado_por).length;
   document.getElementById('contador').textContent = escolhidos + ' de ' + giftable.length + ' presentes escolhidos';
-  if(!lista.length){ body.innerHTML='<tr><td colspan="4" class="estado">Nenhum presente encontrado.</td></tr>'; return; }
+  if(!lista.length){
+    const vazio = soDisp ? 'Nenhum presente disponível com esse filtro.' : 'Nenhum presente encontrado.';
+    body.innerHTML='<tr><td colspan="4" class="estado">'+vazio+'</td></tr>'; return;
+  }
   body.innerHTML = lista.map(g=>{
     const jaTemos = g.reservado_por === 'Já temos';
     const taken = !!g.reservado_por;
