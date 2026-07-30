@@ -68,6 +68,7 @@
   th{padding:11px 10px; font-weight:600; text-align:left}
   th.c{text-align:center}
   th.colref{font-size:11.5px; line-height:1.25; font-weight:600}
+  .so-mobile{display:none}
   td{padding:11px 10px; border-top:1px solid var(--borda); vertical-align:middle}
   td.c{text-align:center}
   tr.taken{background:#FBF0F3}
@@ -121,10 +122,15 @@
     th,td{padding:9px 7px; font-size:12.5px}
     th.colref{font-size:10px; width:66px}
     th.hide,td.hide{display:none}
-    /* o cabecalho longo da coluna de link rouba largura: deixa o botao quebrar
-       em duas linhas para a tabela nao estourar a tela e cortar o "Vou presentear" */
+    /* No celular a tabela nao cabe nos 343px uteis e a .lista tem overflow:hidden,
+       entao o botao "Vou presentear" ficava cortado. Tres ajustes devolvem a largura:
+       botao em duas linhas, cabecalho curto em "Quem", e quebra dos nomes de
+       presente que tem palavras longas coladas (ex.: "(crepeira/panquequeira)"). */
     .btn-mini{white-space:normal; padding:7px 8px; line-height:1.2}
     thead th:last-child{width:74px}
+    .so-desktop{display:none}
+    .so-mobile{display:inline}
+    td:first-child{overflow-wrap:anywhere}
     .toolbar{gap:8px}
     .filtro{flex:1 1 100%; justify-content:center; white-space:normal; font-size:12px}
   }
@@ -198,7 +204,7 @@
         <tr>
           <th>Presente</th>
           <th class="c colref" style="width:96px">Sugestão de Link para Referência</th>
-          <th>Quem presenteará</th>
+          <th><span class="so-desktop">Quem presenteará</span><span class="so-mobile">Quem</span></th>
           <th style="width:110px"></th>
         </tr>
       </thead>
