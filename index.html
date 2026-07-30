@@ -68,7 +68,6 @@
   th{padding:11px 10px; font-weight:600; text-align:left}
   th.c{text-align:center}
   th.colref{font-size:11.5px; line-height:1.25; font-weight:600}
-  .so-mobile{display:none}
   td{padding:11px 10px; border-top:1px solid var(--borda); vertical-align:middle}
   td.c{text-align:center}
   tr.taken{background:#FBF0F3}
@@ -119,20 +118,30 @@
   footer{text-align:center; color:var(--claro); font-size:11px; margin-top:30px}
   @media(max-width:560px){
     .panela{font-size:58px} .nomes{font-size:32px}
-    th,td{padding:9px 7px; font-size:12.5px}
-    th.colref{font-size:10px; width:66px}
-    th.hide,td.hide{display:none}
-    /* No celular a tabela nao cabe nos 343px uteis e a .lista tem overflow:hidden,
-       entao o botao "Vou presentear" ficava cortado. Tres ajustes devolvem a largura:
-       botao em duas linhas, cabecalho curto em "Quem", e quebra dos nomes de
-       presente que tem palavras longas coladas (ex.: "(crepeira/panquequeira)"). */
-    .btn-mini{white-space:normal; padding:7px 8px; line-height:1.2}
-    thead th:last-child{width:74px}
-    .so-desktop{display:none}
-    .so-mobile{display:inline}
-    td:first-child{overflow-wrap:anywhere}
     .toolbar{gap:8px}
     .filtro{flex:1 1 100%; justify-content:center; white-space:normal; font-size:12px}
+
+    /* A tabela de 4 colunas nao cabe na largura de um celular: os nomes longos
+       espremiam as colunas e o botao "Vou presentear" acabava cortado pelo
+       overflow:hidden da .lista. Aqui cada presente vira um cartao, com o nome
+       em cima e "quem presenteara" + acao embaixo. */
+    table, tbody, tr, td{display:block; width:auto}
+    thead{display:none}
+    tr{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:7px 12px;
+       grid-template-areas:"nome nome nome" "link quem acao";
+       padding:13px 14px; border-top:1px solid var(--borda)}
+    tr:first-child{border-top:none}
+    td, td.c{padding:0; border:none; text-align:left}
+    td:nth-child(1){grid-area:nome; font-weight:600; font-size:14px; line-height:1.35;
+                    overflow-wrap:anywhere}
+    td:nth-child(2){grid-area:link}
+    td:nth-child(3){grid-area:quem; font-size:13px; text-align:right}
+    td:nth-child(4){grid-area:acao}
+    a.link{font-size:15px; white-space:nowrap}
+    a.link::after{content:" sugestão"; font-size:11.5px; font-weight:600}
+    .semlink{display:none}
+    .btn-mini{font-size:12.5px; padding:10px 14px}
+    td.estado{grid-column:1/-1; text-align:center; font-weight:400; padding:20px 14px}
   }
 </style>
 </head>
@@ -204,7 +213,7 @@
         <tr>
           <th>Presente</th>
           <th class="c colref" style="width:96px">Sugestão de Link para Referência</th>
-          <th><span class="so-desktop">Quem presenteará</span><span class="so-mobile">Quem</span></th>
+          <th>Quem presenteará</th>
           <th style="width:110px"></th>
         </tr>
       </thead>
