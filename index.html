@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chá de Panela · Danielle & Daniel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vinho:#B0184C; --vinho-esc:#8a123c; --creme:#FCF6F2; --rosa:#FBEEF1;
+    --borda:#F2CFDC; --texto:#2f2330; --muted:#8a6b76; --claro:#c9b3ba;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--creme); color:var(--texto);
+       font-family:'Quicksand',sans-serif; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 16px 60px;}
+  .card{background:#fff; border:1px solid var(--borda); border-radius:16px;}
+
+  /* Cabeçalho */
+  header{text-align:center; padding:34px 16px 26px;}
+  .pre{font-size:11px; letter-spacing:2px; color:var(--vinho); margin-bottom:14px;}
+  .cha{font-size:26px; letter-spacing:6px; color:var(--texto); font-weight:500;}
+  .panela{font-family:'Dancing Script',cursive; font-size:72px; line-height:.85; color:var(--vinho); margin:0 0 6px;}
+  .nomes{font-family:'Playfair Display',serif; font-size:40px; color:var(--texto); font-weight:600; line-height:1.1;}
+  .nomes .e{font-family:'Dancing Script',cursive; color:var(--vinho); font-weight:700;}
+  .heart{color:var(--vinho); font-size:16px; margin:8px 0;}
+
+  /* Cards de informação */
+  .infos{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:6px 0 26px;}
+  .info{flex:1 1 160px; text-align:center; padding:16px 12px;}
+  .info .ic{font-size:24px}
+  .info .big{font-size:17px; color:var(--vinho); font-weight:600; margin-top:4px;}
+  .info .sub{font-size:11px; letter-spacing:.5px; color:var(--muted); margin-top:2px;}
+  .info .med{font-size:14px; color:var(--texto); margin-top:4px;}
+
+  /* Paleta */
+  .paleta{text-align:center; padding:30px 16px; border-top:1px solid var(--borda); border-bottom:1px solid var(--borda); margin-bottom:30px;}
+  .paleta h2{font-family:'Dancing Script',cursive; font-size:40px; color:var(--texto); margin:0; font-weight:700;}
+  .paleta h2 span{color:var(--vinho)}
+  .paleta .leg{font-size:12px; letter-spacing:1px; color:var(--muted); margin:14px 0 18px;}
+  .cores{display:flex; flex-wrap:wrap; justify-content:center; gap:16px 26px;}
+  .cor{display:flex; align-items:center; gap:9px}
+  .cor .dot{width:30px; height:30px; border-radius:50%; border:1px solid var(--borda); display:inline-block}
+  .cor span{font-size:13px; letter-spacing:1px}
+  .carinho{font-size:12px; letter-spacing:1px; color:var(--muted); margin-top:20px}
+
+  /* Seções */
+  .sec-tit{text-align:center; font-size:17px; letter-spacing:2px; font-weight:700; color:var(--vinho); margin:0 0 4px}
+  .sec-sub{text-align:center; font-size:12.5px; color:var(--muted); margin:0 0 16px}
+
+  /* Presentes */
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
+  .toolbar input{flex:1 1 200px}
+  .contador{font-size:12px; color:var(--muted); white-space:nowrap}
+  input, button{font-family:'Quicksand',sans-serif}
+  .campo{width:100%; padding:11px 12px; border:1px solid #E5B9C8; border-radius:10px; font-size:14px; font-weight:500; background:#fff; color:var(--texto)}
+  .campo:focus{outline:none; border-color:var(--vinho); box-shadow:0 0 0 3px var(--rosa)}
+  .lista{overflow:hidden; border:1px solid var(--borda); border-radius:14px}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  thead tr{background:var(--vinho); color:#fff}
+  th{padding:11px 10px; font-weight:600; text-align:left}
+  th.c{text-align:center}
+  td{padding:11px 10px; border-top:1px solid var(--borda); vertical-align:middle}
+  td.c{text-align:center}
+  tr.taken{background:#FBF0F3}
+  .qtd{display:inline-block; min-width:22px; text-align:center; color:var(--muted)}
+  .quem{color:var(--vinho); font-weight:600}
+  .quem.livre{color:var(--claro); font-weight:500; font-style:italic}
+  .btn-mini{font-size:12px; font-weight:600; padding:7px 11px; border-radius:8px; border:1px solid var(--vinho); background:#fff; color:var(--vinho); cursor:pointer; white-space:nowrap}
+  .btn-mini:hover{background:var(--vinho); color:#fff}
+  .reservado{font-size:11px; color:var(--claro)}
+  a.link{color:var(--vinho); text-decoration:none; font-size:18px}
+  a.link:hover{color:var(--vinho-esc)}
+  .semlink{color:#e0cdd4}
+
+  /* RSVP */
+  .rsvp{margin-top:34px; padding:26px 20px}
+  .rsvp h2{font-family:'Dancing Script',cursive; font-size:34px; color:var(--vinho); text-align:center; margin:0 0 2px; font-weight:700}
+  .ac{position:relative; max-width:360px; margin:0 auto}
+  .sug{position:absolute; z-index:20; left:0; right:0; background:#fff; border:1px solid #E5B9C8; border-top:none; border-radius:0 0 10px 10px; overflow:hidden; box-shadow:0 8px 20px rgba(140,20,60,.10)}
+  .sug div{padding:10px 12px; font-size:13.5px; cursor:pointer; border-top:1px solid var(--borda)}
+  .sug div:hover{background:var(--rosa)}
+  .grupo{max-width:360px; margin:16px auto 0}
+  .grupo .lab{font-size:12px; font-weight:600; color:var(--muted); text-align:center; margin-bottom:10px}
+  .membro{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border:1px solid var(--borda); border-radius:10px; margin-bottom:8px}
+  .membro .nm{font-weight:600; font-size:14px}
+  .toggle{display:flex; gap:6px}
+  .tg{font-size:12px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer; border:1px solid #ddd; background:#fff; color:var(--claro)}
+  .tg.vai.on{background:var(--vinho); color:#fff; border-color:var(--vinho)}
+  .tg.nao.on{background:var(--muted); color:#fff; border-color:var(--muted)}
+  .btn-full{width:100%; padding:12px; margin-top:6px; border:none; border-radius:10px; background:var(--vinho); color:#fff; font-weight:600; font-size:14.5px; cursor:pointer}
+  .btn-full:hover{background:var(--vinho-esc)}
+  .btn-full:disabled{opacity:.6; cursor:default}
+
+  /* Modal */
+  .overlay{position:fixed; inset:0; background:rgba(60,20,35,.45); display:none; align-items:center; justify-content:center; padding:16px; z-index:50}
+  .overlay.on{display:flex}
+  .modal{background:#fff; border-radius:16px; padding:24px; max-width:340px; width:100%; text-align:center}
+  .modal .ic{font-size:28px; color:var(--vinho)}
+  .modal h3{font-size:20px; margin:6px 0 2px; color:var(--texto)}
+  .modal .item{font-size:13px; color:var(--muted); margin-bottom:14px}
+  .modal .row{display:flex; gap:8px; margin-top:12px}
+  .modal .row button{flex:1; padding:11px; border-radius:10px; font-weight:600; font-size:13.5px; cursor:pointer}
+  .btn-cancel{border:1px solid #ddd; background:#fff; color:var(--muted)}
+  .btn-ok{border:none; background:var(--vinho); color:#fff}
+
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px); background:var(--vinho); color:#fff; padding:12px 20px; border-radius:12px; font-weight:600; font-size:14px; opacity:0; transition:.3s; z-index:60}
+  .toast.on{transform:translateX(-50%) translateY(0); opacity:1}
+  .estado{text-align:center; color:var(--muted); padding:24px; font-size:14px}
+  footer{text-align:center; color:var(--claro); font-size:11px; margin-top:30px}
+  @media(max-width:560px){
+    .panela{font-size:58px} .nomes{font-size:32px}
+    th,td{padding:9px 7px; font-size:12.5px}
+    th.hide,td.hide{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="pre">VENHA CELEBRAR CONOSCO ESTE MOMENTO ESPECIAL</div>
+    <div class="cha">CHÁ DE</div>
+    <div class="panela">Panela</div>
+    <div class="heart">&#10084;</div>
+    <div class="nomes">Danielle <span class="e">&amp;</span> Daniel</div>
+  </header>
+
+  <div class="infos">
+    <div class="info card">
+      <div class="ic">&#128197;</div>
+      <div class="big">12/09/2026</div>
+      <div class="sub">SÁBADO · ÀS 18H</div>
+    </div>
+    <div class="info card">
+      <div class="ic">&#128205;</div>
+      <div class="med">Rua Pedro de Carvalho, 137</div>
+      <div class="sub">SALÃO DE FESTAS · MEIER</div>
+    </div>
+    <div class="info card">
+      <div class="ic">&#128231;</div>
+      <div class="med">Confirme até 22/08</div>
+      <div class="sub">CONFIRMAÇÃO DE PRESENÇA</div>
+    </div>
+  </div>
+
+  <div class="paleta">
+    <h2>paleta <span>de cores</span></h2>
+    <div class="leg">A PALETA DE CORES DO NOSSO ENXOVAL É COMPOSTA POR:</div>
+    <div class="cores">
+      <div class="cor"><span class="dot" style="background:#FFFFFF"></span><span>BRANCO</span></div>
+      <div class="cor"><span class="dot" style="background:#EFE7DA"></span><span>OFF-WHITE</span></div>
+      <div class="cor"><span class="dot" style="background:#C89B6B"></span><span>AMADEIRADO</span></div>
+      <div class="cor"><span class="dot" style="background:#161616"></span><span>PRETO</span></div>
+    </div>
+    <div class="carinho">MAS QUALQUER PRESENTE SERÁ RECEBIDO COM MUITO CARINHO E AMOR! &#10084;</div>
+  </div>
+
+  <div class="sec-tit">&#127873; NOSSA LISTA DE PRESENTES</div>
+  <div class="sec-sub">Clique em "Vou presentear" para reservar um item &#128522;</div>
+
+  <div class="toolbar">
+    <input id="busca" class="campo" type="text" placeholder="Buscar presente..." oninput="renderGifts()">
+    <div class="contador" id="contador"></div>
+  </div>
+
+  <div class="lista">
+    <table>
+      <thead>
+        <tr>
+          <th>Presente</th>
+          <th class="c" style="width:50px">Link</th>
+          <th>Quem presenteará</th>
+          <th style="width:110px"></th>
+        </tr>
+      </thead>
+      <tbody id="giftbody">
+        <tr><td colspan="4" class="estado">Carregando presentes...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rsvp card">
+    <h2>confirme sua presença</h2>
+    <div class="sec-sub" style="margin-bottom:16px">Digite seu nome e confirme quem vai com você &#128522;</div>
+    <div class="ac">
+      <input id="rsvpNome" class="campo" type="text" autocomplete="off" placeholder="Nome" oninput="suggest()">
+      <div id="sug" class="sug" style="display:none"></div>
+    </div>
+    <div id="grupo" class="grupo" style="display:none"></div>
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+
+<!-- Modal reservar -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="ic">&#10084;</div>
+    <h3>Reservar presente</h3>
+    <div class="item" id="modalItem"></div>
+    <input id="modalNome" class="campo" type="text" placeholder="Digite seu nome">
+    <div class="row">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-ok" id="modalOk" onclick="reservar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://jqufnwvnsegceftsotfa.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdWZud3Zuc2VnY2VmdHNvdGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDcyNjQsImV4cCI6MjEwMDgyMzI2NH0.zc5Exs8aRWE1od6EdJSDmQTobLnQwl50dl4pPuvw8bw";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let gifts = [], guests = [], groups = {}, currentGiftId = null;
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2600); }
+
+/* ---------- PRESENTES ---------- */
+async function loadGifts(){
+  const { data, error } = await db.from('gifts').select('*').order('nome');
+  if(error){ document.getElementById('giftbody').innerHTML='<tr><td colspan="4" class="estado">Erro ao carregar. Recarregue a página.</td></tr>'; return; }
+  gifts = data;
+  renderGifts();
+}
+function renderGifts(){
+  const q = (document.getElementById('busca').value||'').toLowerCase();
+  const body = document.getElementById('giftbody');
+  const lista = gifts.filter(g => g.nome.toLowerCase().includes(q));
+  const giftable = gifts.filter(g => g.reservado_por !== 'Já temos');
+  const escolhidos = giftable.filter(g => g.reservado_por).length;
+  document.getElementById('contador').textContent = escolhidos + ' de ' + giftable.length + ' presentes escolhidos';
+  if(!lista.length){ body.innerHTML='<tr><td colspan="4" class="estado">Nenhum presente encontrado.</td></tr>'; return; }
+  body.innerHTML = lista.map(g=>{
+    const jaTemos = g.reservado_por === 'Já temos';
+    const taken = !!g.reservado_por;
+    const link = g.link
+      ? '<a class="link" href="'+g.link+'" target="_blank" rel="noopener" title="Ver sugestão">&#128279;</a>'
+      : '<span class="semlink">&mdash;</span>';
+    let quem, acao;
+    if(jaTemos){ quem = '<span class="quem livre">já temos</span>'; acao = '<span class="reservado">&mdash;</span>'; }
+    else if(taken){ quem = '<span class="quem">&#10004; '+escapeHtml(g.reservado_por)+'</span>'; acao = '<span class="reservado">reservado</span>'; }
+    else { quem = '<span class="quem livre">disponível</span>'; acao = '<button class="btn-mini" onclick="openModal('+g.id+')">Vou presentear</button>'; }
+    return '<tr class="'+(taken?'taken':'')+'">'
+      + '<td>'+escapeHtml(g.nome)+'</td>'
+      + '<td class="c">'+link+'</td>'
+      + '<td>'+quem+'</td>'
+      + '<td class="c">'+acao+'</td></tr>';
+  }).join('');
+}
+function openModal(id){
+  currentGiftId = id;
+  const g = gifts.find(x=>x.id===id);
+  document.getElementById('modalItem').textContent = g.nome;
+  document.getElementById('modalNome').value = '';
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(()=>document.getElementById('modalNome').focus(), 60);
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('on'); }
+async function reservar(){
+  const nome = document.getElementById('modalNome').value.trim();
+  if(!nome){ toast('Digite seu nome'); return; }
+  const btn = document.getElementById('modalOk'); btn.disabled=true; btn.textContent='Salvando...';
+  const { data, error } = await db.from('gifts')
+    .update({ reservado_por: nome, reservado_em: new Date().toISOString() })
+    .eq('id', currentGiftId).is('reservado_por', null).select();
+  btn.disabled=false; btn.textContent='Salvar';
+  if(error){ toast('Ops, tente novamente'); return; }
+  if(!data || !data.length){ toast('Esse presente acabou de ser reservado por outra pessoa'); await loadGifts(); closeModal(); return; }
+  closeModal();
+  toast('Presente reservado. Muito obrigado! ' + String.fromCodePoint(0x1F49D));
+  await loadGifts();
+}
+
+/* ---------- RSVP ---------- */
+async function loadGuests(){
+  const [{ data: gs }, { data: gr }] = await Promise.all([
+    db.from('guests').select('*'),
+    db.from('guest_groups').select('*')
+  ]);
+  guests = gs || [];
+  (gr||[]).forEach(x=> groups[x.id]=x.nome);
+}
+function suggest(){
+  const q = document.getElementById('rsvpNome').value.trim().toLowerCase();
+  const box = document.getElementById('sug');
+  if(q.length<2){ box.style.display='none'; return; }
+  const m = guests.filter(x=> x.nome.toLowerCase().includes(q)).slice(0,6);
+  if(!m.length){ box.style.display='none'; return; }
+  box.innerHTML = m.map(x=> '<div onclick="pick('+x.id+')">'+escapeHtml(x.nome)+'<span style="color:#c9b3ba;font-size:11px"> · '+x.origem+'</span></div>').join('');
+  box.style.display='block';
+}
+function pick(id){
+  const p = guests.find(x=>x.id===id);
+  document.getElementById('rsvpNome').value = p.nome;
+  document.getElementById('sug').style.display='none';
+  const membros = guests.filter(x=> x.grupo_id===p.grupo_id);
+  let html = '<div class="lab">Quem vai comparecer? &nbsp;(grupo: '+escapeHtml(groups[p.grupo_id]||p.nome)+')</div>';
+  membros.forEach(mm=>{
+    const vai = mm.presenca==='vai', nao = mm.presenca==='nao_vai';
+    html += '<div class="membro" data-id="'+mm.id+'">'
+      + '<span class="nm">'+escapeHtml(mm.nome)+'</span>'
+      + '<span class="toggle">'
+      + '<button class="tg vai'+(vai?' on':'')+'" onclick="setTg(this,1)">Vai</button>'
+      + '<button class="tg nao'+(nao?' on':'')+'" onclick="setTg(this,0)">Não vai</button>'
+      + '</span></div>';
+  });
+  html += '<button class="btn-full" onclick="confirmarRsvp(this)">Confirmar presença</button>';
+  const box = document.getElementById('grupo'); box.innerHTML = html; box.style.display='block';
+}
+function setTg(btn, vai){
+  const wrap = btn.parentNode;
+  wrap.querySelector('.vai').classList.toggle('on', vai===1);
+  wrap.querySelector('.nao').classList.toggle('on', vai===0);
+}
+async function confirmarRsvp(btn){
+  const linhas = [...document.querySelectorAll('#grupo .membro')];
+  const updates = [];
+  linhas.forEach(l=>{
+    const id = +l.dataset.id;
+    const vai = l.querySelector('.vai').classList.contains('on');
+    const nao = l.querySelector('.nao').classList.contains('on');
+    if(vai||nao) updates.push({ id, presenca: vai?'vai':'nao_vai' });
+  });
+  if(!updates.length){ toast('Marque Vai ou Não vai'); return; }
+  btn.disabled=true; btn.textContent='Enviando...';
+  for(const u of updates){
+    await db.from('guests').update({ presenca:u.presenca, rsvp_em:new Date().toISOString() }).eq('id', u.id);
+  }
+  btn.disabled=false; btn.textContent='Confirmar presença';
+  await loadGuests();
+  toast('Presença confirmada. Até lá! ' + String.fromCodePoint(0x1F389));
+  document.getElementById('grupo').style.display='none';
+  document.getElementById('rsvpNome').value='';
+}
+
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+document.addEventListener('click', e=>{ if(!e.target.closest('.ac')) document.getElementById('sug').style.display='none'; });
+document.getElementById('modalNome').addEventListener('keydown', e=>{ if(e.key==='Enter') reservar(); });
+
+loadGifts();
+loadGuests();
+</script>
+</body>
+</html>
