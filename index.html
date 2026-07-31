@@ -25,7 +25,11 @@
   .panela{font-family:'Dancing Script',cursive; font-size:72px; line-height:.85; color:var(--vinho); margin:0 0 6px;}
   .nomes{font-family:'Playfair Display',serif; font-size:40px; color:var(--texto); font-weight:600; line-height:1.1;}
   .nomes .e{font-family:'Dancing Script',cursive; color:var(--vinho); font-weight:700;}
-  .heart{color:var(--vinho); font-size:16px; margin:8px 0;}
+  /* Monograma DD: um "D" normal e outro espelhado, sobrepostos */
+  .logo{display:flex; justify-content:center; align-items:center; margin:12px 0 8px;
+        font-family:'Playfair Display',serif; font-weight:700; font-size:54px;
+        line-height:1; color:var(--vinho); letter-spacing:0}
+  .logo .espelhado{transform:scaleX(-1); margin-left:-15px}
 
   /* Cards de informação */
   .infos{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:6px 0 26px;}
@@ -173,7 +177,9 @@
     <div class="pre">VENHA CELEBRAR CONOSCO ESTE MOMENTO ESPECIAL</div>
     <div class="cha">CHÁ DE</div>
     <div class="panela">Panela</div>
-    <div class="heart">&#10084;</div>
+    <div class="logo" role="img" aria-label="Monograma DD de Danielle e Daniel">
+      <span>D</span><span class="espelhado">D</span>
+    </div>
     <div class="nomes">Danielle <span class="e">&amp;</span> Daniel</div>
   </header>
 
@@ -181,7 +187,7 @@
     <div class="info card">
       <div class="ic">&#128197;</div>
       <div class="big">12/09/2026</div>
-      <div class="sub">SÁBADO · ÀS 18H</div>
+      <div class="sub">SÁBADO · ÀS 17H</div>
     </div>
     <div class="info card">
       <div class="ic">&#128205;</div>
@@ -220,7 +226,8 @@
   </div>
 
   <div class="sec-tit" style="margin-top:38px">&#127873; NOSSA LISTA DE PRESENTES</div>
-  <div class="sec-sub">Clique em "Vou presentear" para reservar um item &#128522;</div>
+  <div class="sec-sub">Clique em "Vou presentear" para reservar um item.
+       Sinta-se à vontade para presentear o quanto quiser &#128522;</div>
 
   <div class="recado">
     <p>Os links da nossa lista são apenas uma sugestão para servir de referência e facilitar
@@ -228,6 +235,8 @@
     <p>Fiquem à vontade para comprar em qualquer loja de sua preferência, desde que seja um
        item semelhante ao da lista. O mais importante para nós é o carinho de vocês em fazer
        parte desse momento tão especial!</p>
+    <p>Caso prefiram colocar o nosso endereço para a entrega do presente, é só entrar em
+       contato com a gente que teremos o maior prazer em informá-lo.</p>
   </div>
 
   <div class="toolbar">
@@ -259,11 +268,6 @@
         <tr><td colspan="4" class="estado">Carregando presentes...</td></tr>
       </tbody>
     </table>
-  </div>
-
-  <div class="recado entrega">
-    <p>Caso prefiram colocar o nosso endereço para a entrega do presente, é só entrar em
-       contato com a gente que teremos o maior prazer em informá-lo. &#128140;</p>
   </div>
 
   <footer id="footer"></footer>
@@ -320,22 +324,21 @@ function renderGifts(){
   const lista = gifts.filter(g => g.nome.toLowerCase().includes(q)
                               && (!soDisp || !g.reservado_por)
                               && naFaixa(g.preco, faixa));
-  const giftable = gifts.filter(g => g.reservado_por !== 'Já temos');
-  const escolhidos = giftable.filter(g => g.reservado_por).length;
-  document.getElementById('contador').textContent = escolhidos + ' de ' + giftable.length + ' presentes escolhidos';
+  const escolhidos = gifts.filter(g => g.reservado_por).length;
+  document.getElementById('contador').textContent = escolhidos + ' de ' + gifts.length + ' presentes escolhidos';
   if(!lista.length){
     const vazio = (soDisp || faixa) ? 'Nenhum presente com esses filtros.' : 'Nenhum presente encontrado.';
     body.innerHTML='<tr><td colspan="4" class="estado">'+vazio+'</td></tr>'; return;
   }
   body.innerHTML = lista.map(g=>{
-    const jaTemos = g.reservado_por === 'Já temos';
     const taken = !!g.reservado_por;
     const link = g.link
       ? '<a class="link" href="'+g.link+'" target="_blank" rel="noopener" title="Ver sugestão">&#128279;</a>'
       : '<span class="semlink">&mdash;</span>';
     let quem, acao;
-    if(jaTemos){ quem = '<span class="quem livre">já temos</span>'; acao = '<span class="reservado">&mdash;</span>'; }
-    else if(taken){ quem = '<span class="quem">&#10004; '+escapeHtml(g.reservado_por)+'</span>'; acao = '<span class="reservado">reservado</span>'; }
+    /* Presente ja escolhido continua na lista, com o nome de quem presenteou
+       e sem o botao, para ninguem presentear o mesmo item duas vezes. */
+    if(taken){ quem = '<span class="quem">&#10004; '+escapeHtml(g.reservado_por)+'</span>'; acao = '<span class="reservado">reservado</span>'; }
     else { quem = '<span class="quem livre">disponível</span>'; acao = '<button class="btn-mini" onclick="openModal('+g.id+')">Vou presentear</button>'; }
     return '<tr class="'+(taken?'taken':'')+'">'
       + '<td>'+escapeHtml(g.nome)+'</td>'
