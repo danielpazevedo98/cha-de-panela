@@ -50,9 +50,22 @@
   .sec-tit{text-align:center; font-size:17px; letter-spacing:2px; font-weight:700; color:var(--vinho); margin:0 0 4px}
   .sec-sub{text-align:center; font-size:12.5px; color:var(--muted); margin:0 0 16px}
 
+  /* Recados */
+  .recado{background:var(--rosa); border:1px solid var(--borda); border-radius:14px;
+          padding:14px 18px; margin:0 0 14px; font-size:13px; line-height:1.55; color:var(--texto)}
+  .recado p{margin:0}
+  .recado p + p{margin-top:9px}
+  .recado.entrega{margin:16px 0 0; background:#fff; text-align:center}
+
   /* Presentes */
   .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
-  .toolbar #busca{flex:1 1 200px}
+  .toolbar #busca{flex:1 1 190px}
+  .faixa{flex:0 1 auto; width:auto; cursor:pointer; padding-right:30px;
+         appearance:none; -webkit-appearance:none;
+         background-image:linear-gradient(45deg,transparent 50%,var(--vinho) 50%),
+                          linear-gradient(135deg,var(--vinho) 50%,transparent 50%);
+         background-position:calc(100% - 16px) 18px, calc(100% - 11px) 18px;
+         background-size:5px 5px, 5px 5px; background-repeat:no-repeat}
   .contador{font-size:12px; color:var(--muted); white-space:nowrap}
   .filtro{display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600;
           color:var(--vinho); cursor:pointer; user-select:none; white-space:nowrap;
@@ -88,8 +101,14 @@
   .sug{position:absolute; z-index:20; left:0; right:0; background:#fff; border:1px solid #E5B9C8; border-top:none; border-radius:0 0 10px 10px; overflow:hidden; box-shadow:0 8px 20px rgba(140,20,60,.10)}
   .sug div{padding:10px 12px; font-size:13.5px; cursor:pointer; border-top:1px solid var(--borda)}
   .sug div:hover{background:var(--rosa)}
+  .sug .dica{color:var(--claro); font-size:11px}
+  .sug .vazio{cursor:default; color:var(--muted); font-size:12.5px; line-height:1.5}
+  .sug .vazio:hover{background:#fff}
   .grupo{max-width:360px; margin:16px auto 0}
-  .grupo .lab{font-size:12px; font-weight:600; color:var(--muted); text-align:center; margin-bottom:10px}
+  .grupo .lab{font-size:12px; font-weight:600; color:var(--muted); text-align:center; margin-bottom:4px}
+  .grupo .ajuda{font-size:11.5px; color:var(--claro); text-align:center; line-height:1.45; margin-bottom:12px}
+  .quemconf{margin:14px 0 10px; text-align:left}
+  .quemconf label{display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px}
   .membro{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border:1px solid var(--borda); border-radius:10px; margin-bottom:8px}
   .membro .nm{font-weight:600; font-size:14px}
   .toggle{display:flex; gap:6px}
@@ -120,6 +139,8 @@
     .panela{font-size:58px} .nomes{font-size:32px}
     .toolbar{gap:8px}
     .filtro{flex:1 1 100%; justify-content:center; white-space:normal; font-size:12px}
+    .faixa{flex:1 1 100%; width:100%}
+    .recado{font-size:12.5px; padding:13px 15px}
 
     /* A tabela de 4 colunas nao cabe na largura de um celular: os nomes longos
        espremiam as colunas e o botao "Vou presentear" acabava cortado pelo
@@ -190,7 +211,7 @@
 
   <div class="rsvp card">
     <h2>confirme sua presença</h2>
-    <div class="sec-sub" style="margin-bottom:16px">Digite seu nome e confirme quem vai com você &#128522;</div>
+    <div class="sec-sub" style="margin-bottom:16px">Digite seu nome para encontrar você e quem vai com você &#128522;</div>
     <div class="ac">
       <input id="rsvpNome" class="campo" type="text" autocomplete="off" placeholder="Nome" oninput="suggest()">
       <div id="sug" class="sug" style="display:none"></div>
@@ -201,8 +222,25 @@
   <div class="sec-tit" style="margin-top:38px">&#127873; NOSSA LISTA DE PRESENTES</div>
   <div class="sec-sub">Clique em "Vou presentear" para reservar um item &#128522;</div>
 
+  <div class="recado">
+    <p>Os links da nossa lista são apenas uma sugestão para servir de referência e facilitar
+       a compra de quem preferir comprar pela internet.</p>
+    <p>Fiquem à vontade para comprar em qualquer loja de sua preferência, desde que seja um
+       item semelhante ao da lista. O mais importante para nós é o carinho de vocês em fazer
+       parte desse momento tão especial!</p>
+  </div>
+
   <div class="toolbar">
     <input id="busca" class="campo" type="text" placeholder="Buscar presente..." oninput="renderGifts()">
+    <select id="faixaPreco" class="campo faixa" onchange="renderGifts()">
+      <option value="">Faixa de preço (aproximado)</option>
+      <option value="0-50">Até R$ 50</option>
+      <option value="50-80">R$ 50 a R$ 80</option>
+      <option value="80-100">R$ 80 a R$ 100</option>
+      <option value="100-150">R$ 100 a R$ 150</option>
+      <option value="150-200">R$ 150 a R$ 200</option>
+      <option value="200-">Acima de R$ 200</option>
+    </select>
     <label class="filtro"><input type="checkbox" id="soDisponiveis" onchange="renderGifts()"> Só o que ainda não foi presenteado</label>
     <div class="contador" id="contador"></div>
   </div>
@@ -221,6 +259,11 @@
         <tr><td colspan="4" class="estado">Carregando presentes...</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="recado entrega">
+    <p>Caso prefiram colocar o nosso endereço para a entrega do presente, é só entrar em
+       contato com a gente que teremos o maior prazer em informá-lo. &#128140;</p>
   </div>
 
   <footer id="footer"></footer>
@@ -248,7 +291,7 @@ const SUPABASE_URL = "https://jqufnwvnsegceftsotfa.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdWZud3Zuc2VnY2VmdHNvdGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDcyNjQsImV4cCI6MjEwMDgyMzI2NH0.zc5Exs8aRWE1od6EdJSDmQTobLnQwl50dl4pPuvw8bw";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let gifts = [], guests = [], groups = {}, currentGiftId = null;
+let gifts = [], guests = [], currentGiftId = null;
 
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2600); }
 
@@ -259,16 +302,29 @@ async function loadGifts(){
   gifts = data;
   renderGifts();
 }
+/* Faixa vem como "50-80" ou "200-" (sem teto). O limite de baixo entra na faixa
+   e o de cima nao: um presente de R$ 50 aparece em "R$ 50 a R$ 80", nao em "Ate R$ 50".
+   Item sem preco cadastrado so aparece quando nenhuma faixa esta selecionada. */
+function naFaixa(preco, faixa){
+  if(!faixa) return true;
+  if(preco === null || preco === undefined) return false;
+  const [min, max] = faixa.split('-');
+  if(preco < Number(min)) return false;
+  return max === '' ? true : preco < Number(max);
+}
 function renderGifts(){
   const q = (document.getElementById('busca').value||'').toLowerCase();
   const soDisp = document.getElementById('soDisponiveis').checked;
+  const faixa = document.getElementById('faixaPreco').value;
   const body = document.getElementById('giftbody');
-  const lista = gifts.filter(g => g.nome.toLowerCase().includes(q) && (!soDisp || !g.reservado_por));
+  const lista = gifts.filter(g => g.nome.toLowerCase().includes(q)
+                              && (!soDisp || !g.reservado_por)
+                              && naFaixa(g.preco, faixa));
   const giftable = gifts.filter(g => g.reservado_por !== 'Já temos');
   const escolhidos = giftable.filter(g => g.reservado_por).length;
   document.getElementById('contador').textContent = escolhidos + ' de ' + giftable.length + ' presentes escolhidos';
   if(!lista.length){
-    const vazio = soDisp ? 'Nenhum presente disponível com esse filtro.' : 'Nenhum presente encontrado.';
+    const vazio = (soDisp || faixa) ? 'Nenhum presente com esses filtros.' : 'Nenhum presente encontrado.';
     body.innerHTML='<tr><td colspan="4" class="estado">'+vazio+'</td></tr>'; return;
   }
   body.innerHTML = lista.map(g=>{
@@ -313,39 +369,57 @@ async function reservar(){
 }
 
 /* ---------- RSVP ---------- */
+/* Só entram na busca os convidados marcados como "Verde" na planilha. Quem já
+   confirmou some da lista: a ideia é que cada pessoa seja confirmada uma vez só. */
 async function loadGuests(){
-  const [{ data: gs }, { data: gr }] = await Promise.all([
-    db.from('guests').select('*'),
-    db.from('guest_groups').select('*')
-  ]);
+  const { data: gs } = await db.from('guests').select('*').eq('lista','Verde');
   guests = gs || [];
-  (gr||[]).forEach(x=> groups[x.id]=x.nome);
+}
+function pendentes(){ return guests.filter(x=> !x.presenca); }
+function companheiros(p){
+  return guests.filter(x=> x.grupo_id===p.grupo_id && x.id!==p.id).map(x=> x.nome);
 }
 function suggest(){
   const q = document.getElementById('rsvpNome').value.trim().toLowerCase();
   const box = document.getElementById('sug');
   if(q.length<2){ box.style.display='none'; return; }
-  const m = guests.filter(x=> x.nome.toLowerCase().includes(q)).slice(0,6);
-  if(!m.length){ box.style.display='none'; return; }
-  box.innerHTML = m.map(x=> '<div onclick="pick('+x.id+')">'+escapeHtml(x.nome)+'<span style="color:#c9b3ba;font-size:11px"> · '+x.origem+'</span></div>').join('');
+  const m = pendentes().filter(x=> x.nome.toLowerCase().includes(q)).slice(0,6);
+  if(!m.length){
+    box.innerHTML = '<div class="vazio">Nenhum convidado encontrado com esse nome. '
+                  + 'Se você já confirmou, não precisa confirmar de novo &#128522;</div>';
+    box.style.display='block'; return;
+  }
+  /* mostra com quem a pessoa vai, para diferenciar convidados de mesmo nome */
+  box.innerHTML = m.map(x=>{
+    const c = companheiros(x);
+    const dica = c.length ? ' · com ' + escapeHtml(c.slice(0,2).join(', ')) : '';
+    return '<div onclick="pick('+x.id+')">'+escapeHtml(x.nome)
+         + '<span class="dica">'+dica+'</span></div>';
+  }).join('');
   box.style.display='block';
 }
 function pick(id){
   const p = guests.find(x=>x.id===id);
   document.getElementById('rsvpNome').value = p.nome;
   document.getElementById('sug').style.display='none';
-  const membros = guests.filter(x=> x.grupo_id===p.grupo_id);
-  let html = '<div class="lab">Quem vai comparecer? &nbsp;(grupo: '+escapeHtml(groups[p.grupo_id]||p.nome)+')</div>';
+  /* mostra só quem ainda não foi confirmado, inclusive a própria pessoa */
+  const membros = pendentes().filter(x=> x.grupo_id===p.grupo_id);
+  let html = '<div class="lab">Marque quem vai comparecer</div>'
+           + '<div class="ajuda">Você não precisa responder por todo mundo — '
+           + 'marque só quem você puder confirmar agora.</div>';
   membros.forEach(mm=>{
-    const vai = mm.presenca==='vai', nao = mm.presenca==='nao_vai';
     html += '<div class="membro" data-id="'+mm.id+'">'
       + '<span class="nm">'+escapeHtml(mm.nome)+'</span>'
       + '<span class="toggle">'
-      + '<button class="tg vai'+(vai?' on':'')+'" onclick="setTg(this,1)">Vai</button>'
-      + '<button class="tg nao'+(nao?' on':'')+'" onclick="setTg(this,0)">Não vai</button>'
+      + '<button class="tg vai" onclick="setTg(this,1)">Vai</button>'
+      + '<button class="tg nao" onclick="setTg(this,0)">Não vai</button>'
       + '</span></div>';
   });
-  html += '<button class="btn-full" onclick="confirmarRsvp(this)">Confirmar presença</button>';
+  html += '<div class="quemconf">'
+        + '<label for="confirmadoPor">Quem está preenchendo esta confirmação?</label>'
+        + '<input id="confirmadoPor" class="campo" type="text" autocomplete="off" value="'
+        + escapeHtml(p.nome) + '"></div>'
+        + '<button class="btn-full" onclick="confirmarRsvp(this)">Confirmar presença</button>';
   const box = document.getElementById('grupo'); box.innerHTML = html; box.style.display='block';
 }
 function setTg(btn, vai){
@@ -362,14 +436,24 @@ async function confirmarRsvp(btn){
     const nao = l.querySelector('.nao').classList.contains('on');
     if(vai||nao) updates.push({ id, presenca: vai?'vai':'nao_vai' });
   });
-  if(!updates.length){ toast('Marque Vai ou Não vai'); return; }
+  if(!updates.length){ toast('Marque Vai ou Não vai para pelo menos uma pessoa'); return; }
+  const quem = document.getElementById('confirmadoPor').value.trim();
+  if(!quem){ toast('Diga quem está preenchendo a confirmação'); return; }
   btn.disabled=true; btn.textContent='Enviando...';
+  const agora = new Date().toISOString();
+  let falhas = 0;
   for(const u of updates){
-    await db.from('guests').update({ presenca:u.presenca, rsvp_em:new Date().toISOString() }).eq('id', u.id);
+    const { error } = await db.from('guests')
+      .update({ presenca:u.presenca, rsvp_em:agora, confirmado_por:quem })
+      .eq('id', u.id);
+    if(error) falhas++;
   }
   btn.disabled=false; btn.textContent='Confirmar presença';
   await loadGuests();
-  toast('Presença confirmada. Até lá! ' + String.fromCodePoint(0x1F389));
+  if(falhas){ toast('Não consegui salvar tudo. Tente de novo, por favor'); return; }
+  const n = updates.length;
+  toast(n===1 ? 'Presença confirmada. Até lá! ' + String.fromCodePoint(0x1F389)
+              : n + ' presenças confirmadas. Até lá! ' + String.fromCodePoint(0x1F389));
   document.getElementById('grupo').style.display='none';
   document.getElementById('rsvpNome').value='';
 }
