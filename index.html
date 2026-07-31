@@ -292,8 +292,11 @@ let gifts = [], guests = [], currentGiftId = null;
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 2600); }
 
 /* ---------- PRESENTES ---------- */
+/* Só entram os presentes marcados como publicados. Os demais ficam guardados
+   no banco e aparecem apenas no admin, prontos para entrar na lista quando o
+   casal quiser. */
 async function loadGifts(){
-  const { data, error } = await db.from('gifts').select('*').order('nome');
+  const { data, error } = await db.from('gifts').select('*').eq('publicado', true).order('nome');
   if(error){ document.getElementById('giftbody').innerHTML='<tr><td colspan="4" class="estado">Erro ao carregar. Recarregue a página.</td></tr>'; return; }
   gifts = data;
   renderGifts();

@@ -203,6 +203,11 @@
   <section id="abaPresentes" style="display:none">
     <div class="barra">
       <input id="buscaPres" class="campo" type="text" placeholder="Buscar presente..." oninput="renderPresentes()">
+      <select id="filtroPub" class="campo" onchange="renderPresentes()">
+        <option value="">No site e fora dele</option>
+        <option value="sim">Só os que estão no site</option>
+        <option value="nao">Só os guardados (fora do site)</option>
+      </select>
       <select id="filtroRes" class="campo" onchange="renderPresentes()">
         <option value="">Todos</option>
         <option value="livre">Só disponíveis</option>
@@ -214,7 +219,7 @@
     <div class="tabela">
       <table>
         <thead><tr>
-          <th>Presente</th><th class="some">Preço</th><th class="some">Link</th>
+          <th>Presente</th><th>No site</th><th class="some">Preço</th><th class="some">Link</th>
           <th>Quem escolheu</th><th></th>
         </tr></thead>
         <tbody id="corpoPresentes"></tbody>
@@ -314,14 +319,16 @@ function renderPainel(){
     + card(pend,'AINDA NÃO RESPONDERAM','')
     + card(verdes.length,'CONVIDADOS NO SITE','');
 
-  const esc_ = presentes.filter(p=>p.reservado_por);
-  const total = presentes.reduce((s,p)=>s+Number(p.preco||0),0);
+  const noSite = presentes.filter(p=>p.publicado);
+  const esc_ = noSite.filter(p=>p.reservado_por);
+  const total = noSite.reduce((s,p)=>s+Number(p.preco||0),0);
   const totalEsc = esc_.reduce((s,p)=>s+Number(p.preco||0),0);
   document.getElementById('cardsPresentes').innerHTML =
       card(esc_.length,'JÁ ESCOLHIDOS','verde')
-    + card(presentes.length-esc_.length,'AINDA DISPONÍVEIS','')
+    + card(noSite.length-esc_.length,'AINDA DISPONÍVEIS','')
+    + card(presentes.length-noSite.length,'GUARDADOS FORA DO SITE','')
     + card(reais(totalEsc),'VALOR JÁ PRESENTEADO','')
-    + card(reais(total),'VALOR TOTAL DA LISTA','');
+    + card(reais(total),'VALOR TOTAL NO SITE','');
 
   const ordenados = [...esc_].sort((a,b)=>(b.reservado_em||'').localeCompare(a.reservado_em||''));
   document.getElementById('corpoEscolhidos').innerHTML = ordenados.length
@@ -456,15 +463,22 @@ async function excluirConvidado(id){
 function renderPresentes(){
   const q = document.getElementById('buscaPres').value.trim().toLowerCase();
   const f = document.getElementById('filtroRes').value;
+  const fp = document.getElementById('filtroPub').value;
   let lista = presentes.filter(p=>{
     if(q && !p.nome.toLowerCase().includes(q)) return false;
     if(f === 'livre' && p.reservado_por) return false;
     if(f === 'reservado' && !p.reservado_por) return false;
+    if(fp === 'sim' && !p.publicado) return false;
+    if(fp === 'nao' && p.publicado) return false;
     return true;
   });
   document.getElementById('contPres').textContent = lista.length + ' de ' + presentes.length;
-  document.getElementById('corpoPresentes').innerHTML = lista.length ? lista.map(p=>'<tr>'
-    + '<td><b>'+esc(p.nome)+'</b></td>'
+  document.getElementById('corpoPresentes').innerHTML = lista.length ? lista.map(p=>'<tr'
+    + (p.publicado ? '' : ' style="background:#faf7f8"')+'>'
+    + '<td><b'+(p.publicado?'':' style="color:var(--muted)"')+'>'+esc(p.nome)+'</b></td>'
+    + '<td><button class="mini" onclick="alternarPublicado('+p.id+')">'
+      + (p.publicado ? '<span class="tag vai">no site</span>'
+                     : '<span class="tag pend">guardado</span>')+'</button></td>'
     + '<td class="some">'+reais(p.preco)+'</td>'
     + '<td class="some">'+(p.link
         ? '<a href="'+esc(p.link)+'" target="_blank" rel="noopener" style="color:var(--vinho)">abrir</a>'
@@ -480,11 +494,34 @@ function renderPresentes(){
           : '<button class="mini" onclick="reservarManual('+p.id+')">Marcar quem deu</button>')
       + '<button class="mini perigo" onclick="excluirPresente('+p.id+')">Excluir</button>'
     + '</div></td></tr>').join('')
-    : '<tr><td colspan="5" class="vazio">Nenhum presente com esses filtros.</td></tr>';
+    : '<tr><td colspan="6" class="vazio">Nenhum presente com esses filtros.</td></tr>';
+}
+
+/* Liga e desliga a exibicao do presente no site dos convidados, sem apagar nada. */
+async function alternarPublicado(id){
+  const p = presentes.find(x=>x.id===id);
+  if(p.publicado && p.reservado_por){
+    confirmar('Tirar do site',
+      '<b>'+esc(p.nome)+'</b> já foi escolhido por <b>'+esc(p.reservado_por)+'</b>. '
+      + 'Tirando do site, esse presente some da lista dos convidados, mas a escolha '
+      + 'continua guardada aqui no admin.',
+      () => gravarPublicado(id, false));
+    return;
+  }
+  await gravarPublicado(id, !p.publicado);
+}
+async function gravarPublicado(id, valor){
+  const p = presentes.find(x=>x.id===id);
+  const r = await db.from('gifts').update({publicado: valor}).eq('id', id);
+  if(r.error){ toast('Erro: '+r.error.message); return false; }
+  toast(valor ? '"'+p.nome+'" agora aparece no site'
+              : '"'+p.nome+'" saiu do site (continua guardado aqui)');
+  await carregarTudo(); return true;
 }
 
 function editarPresente(id){
-  const p = id ? presentes.find(x=>x.id===id) : {nome:'',preco:'',link:'',quantidade:1};
+  const p = id ? presentes.find(x=>x.id===id)
+               : {nome:'',preco:'',link:'',quantidade:1,publicado:true};
   abrirModal(
     (id?'Editar presente':'Novo presente'),
     '<label>Nome</label><input id="g_nome" class="campo" value="'+esc(p.nome)+'">'
@@ -492,6 +529,11 @@ function editarPresente(id){
       + '<input id="g_preco" class="campo" type="number" step="0.01" value="'+(p.preco??'')+'">'
     + '<label>Link de sugestão (opcional)</label>'
       + '<input id="g_link" class="campo" value="'+esc(p.link||'')+'">'
+    + '<label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-top:14px">'
+      + '<input id="g_pub" type="checkbox" style="width:16px;height:16px;accent-color:var(--vinho)"'
+      + (p.publicado ? ' checked' : '') + '> Mostrar na lista do site'
+      + '</label>'
+      + '<div class="sub">Desmarcado, o presente fica guardado só aqui no admin.</div>'
     + (id ? '' : '<label>Quantas unidades vocês precisam?</label>'
         + '<input id="g_qtd" class="campo" type="number" min="1" max="20" value="1">'
         + '<div class="sub" style="margin-top:6px">Cria uma linha por unidade, '
@@ -503,7 +545,8 @@ function editarPresente(id){
       const dados = {
         nome,
         preco: preco === '' ? null : Number(preco),
-        link: document.getElementById('g_link').value.trim() || null
+        link: document.getElementById('g_link').value.trim() || null,
+        publicado: document.getElementById('g_pub').checked
       };
       let r;
       if(id){
