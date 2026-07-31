@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Chá de Panela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vinho:#B0184C; --vinho-esc:#8a123c; --creme:#FCF6F2; --rosa:#FBEEF1;
+    --borda:#F2CFDC; --texto:#2f2330; --muted:#8a6b76; --claro:#c9b3ba;
+    --ok:#1f7a4d; --ok-bg:#e8f5ee; --nao:#9a3b3b; --nao-bg:#fbeded;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--creme); color:var(--texto);
+       font-family:'Quicksand',sans-serif; -webkit-font-smoothing:antialiased; font-size:14px}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 14px 70px}
+  input,button,select,textarea{font-family:'Quicksand',sans-serif; font-size:14px}
+
+  /* ----- Login ----- */
+  .login{max-width:340px; margin:12vh auto; background:#fff; border:1px solid var(--borda);
+         border-radius:16px; padding:28px 24px; text-align:center}
+  .login h1{font-size:19px; margin:0 0 4px; color:var(--vinho); letter-spacing:1px}
+  .login p{font-size:12.5px; color:var(--muted); margin:0 0 18px}
+  .campo{width:100%; padding:11px 12px; border:1px solid #E5B9C8; border-radius:10px;
+         background:#fff; color:var(--texto); font-weight:500}
+  .campo:focus{outline:none; border-color:var(--vinho); box-shadow:0 0 0 3px var(--rosa)}
+  .login .campo{margin-bottom:10px}
+  .btn{padding:11px 16px; border:none; border-radius:10px; background:var(--vinho); color:#fff;
+       font-weight:600; cursor:pointer}
+  .btn:hover{background:var(--vinho-esc)}
+  .btn:disabled{opacity:.55; cursor:default}
+  .btn-full{width:100%}
+  .erro{color:var(--nao); font-size:12.5px; margin-top:10px; min-height:16px}
+
+  /* ----- Cabeçalho ----- */
+  header{display:flex; align-items:center; justify-content:space-between; gap:12px;
+         padding:18px 0 14px; flex-wrap:wrap}
+  header h1{font-size:17px; margin:0; letter-spacing:1.5px; color:var(--vinho); font-weight:700}
+  header .quem{font-size:12px; color:var(--muted)}
+  .btn-sec{background:#fff; color:var(--vinho); border:1px solid var(--vinho); padding:8px 13px;
+           border-radius:9px; font-weight:600; cursor:pointer}
+  .btn-sec:hover{background:var(--rosa)}
+
+  /* ----- Abas ----- */
+  .abas{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap}
+  .aba{padding:9px 16px; border:1px solid var(--borda); border-radius:10px; background:#fff;
+       cursor:pointer; font-weight:600; color:var(--muted)}
+  .aba.on{background:var(--vinho); border-color:var(--vinho); color:#fff}
+
+  /* ----- Painel ----- */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:22px}
+  .card{background:#fff; border:1px solid var(--borda); border-radius:14px; padding:14px 16px}
+  .card .n{font-size:26px; font-weight:700; color:var(--vinho); line-height:1.1}
+  .card .r{font-size:11.5px; color:var(--muted); letter-spacing:.5px; margin-top:3px}
+  .card.verde .n{color:var(--ok)} .card.vermelho .n{color:var(--nao)}
+  h2.sec{font-size:13px; letter-spacing:1.5px; color:var(--muted); margin:24px 0 10px; font-weight:700}
+
+  /* ----- Barra de ferramentas ----- */
+  .barra{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
+  .barra .campo{width:auto; flex:1 1 190px}
+  .barra select.campo{flex:0 1 auto; cursor:pointer}
+  .cont{font-size:12px; color:var(--muted); margin-left:auto; white-space:nowrap}
+
+  /* ----- Tabela ----- */
+  .tabela{background:#fff; border:1px solid var(--borda); border-radius:14px; overflow:hidden}
+  table{width:100%; border-collapse:collapse}
+  th{background:var(--vinho); color:#fff; text-align:left; padding:10px; font-weight:600; font-size:12.5px}
+  td{padding:9px 10px; border-top:1px solid var(--borda); vertical-align:middle; font-size:13px}
+  tbody tr:hover{background:var(--rosa)}
+  .acoes{display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap}
+  .mini{font-size:11.5px; font-weight:600; padding:5px 9px; border-radius:7px; cursor:pointer;
+        border:1px solid var(--borda); background:#fff; color:var(--muted); white-space:nowrap}
+  .mini:hover{border-color:var(--vinho); color:var(--vinho)}
+  .mini.perigo:hover{border-color:var(--nao); color:var(--nao)}
+  .tag{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600}
+  .tag.vai{background:var(--ok-bg); color:var(--ok)}
+  .tag.naovai{background:var(--nao-bg); color:var(--nao)}
+  .tag.pend{background:#f1eef0; color:var(--muted)}
+  .tag.Verde{background:var(--ok-bg); color:var(--ok)}
+  .tag.Amarelo{background:#fdf4e3; color:#8a6a1f}
+  .tag.Vermelho{background:var(--nao-bg); color:var(--nao)}
+  .vazio{text-align:center; color:var(--muted); padding:26px; font-size:13px}
+  .sub{font-size:11.5px; color:var(--claro)}
+
+  /* ----- Modal ----- */
+  .overlay{position:fixed; inset:0; background:rgba(60,20,35,.5); display:none;
+           align-items:center; justify-content:center; padding:16px; z-index:50}
+  .overlay.on{display:flex}
+  .modal{background:#fff; border-radius:16px; padding:22px; max-width:430px; width:100%;
+         max-height:88vh; overflow-y:auto}
+  .modal h3{margin:0 0 14px; font-size:17px; color:var(--vinho)}
+  .modal label{display:block; font-size:12px; font-weight:600; color:var(--muted);
+               margin:11px 0 5px}
+  .modal .linha{display:flex; gap:9px; margin-top:18px}
+  .modal .linha button{flex:1}
+  .aviso{background:var(--nao-bg); color:var(--nao); border-radius:10px; padding:11px 13px;
+         font-size:12.5px; line-height:1.5; margin-top:6px}
+
+  .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(80px);
+         background:var(--vinho); color:#fff; padding:11px 20px; border-radius:12px;
+         font-weight:600; opacity:0; transition:.3s; z-index:60; max-width:90vw; text-align:center}
+  .toast.on{transform:translateX(-50%) translateY(0); opacity:1}
+
+  @media(max-width:700px){
+    .cont{margin-left:0; width:100%}
+    th.some, td.some{display:none}
+    td{padding:8px 7px; font-size:12.5px}
+    th{padding:9px 7px; font-size:11.5px}
+    .acoes{justify-content:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="telaLogin" class="login">
+  <h1>ÁREA RESTRITA</h1>
+  <p>Chá de Panela · Danielle &amp; Daniel</p>
+  <form id="formLogin">
+    <input id="email" class="campo" type="email" placeholder="E-mail" autocomplete="username" required>
+    <input id="senha" class="campo" type="password" placeholder="Senha" autocomplete="current-password" required>
+    <button class="btn btn-full" id="btnEntrar" type="submit">Entrar</button>
+  </form>
+  <div class="erro" id="erroLogin"></div>
+</div>
+
+<!-- ================= PAINEL ================= -->
+<div id="telaAdmin" class="wrap" style="display:none">
+  <header>
+    <h1>ADMINISTRAÇÃO</h1>
+    <div style="display:flex; align-items:center; gap:12px">
+      <span class="quem" id="quemLogado"></span>
+      <button class="btn-sec" onclick="sair()">Sair</button>
+    </div>
+  </header>
+
+  <div class="abas">
+    <button class="aba on" data-aba="painel"     onclick="mostrarAba('painel')">Painel</button>
+    <button class="aba"    data-aba="convidados" onclick="mostrarAba('convidados')">Convidados</button>
+    <button class="aba"    data-aba="presentes"  onclick="mostrarAba('presentes')">Presentes</button>
+  </div>
+
+  <!-- ---- Painel ---- -->
+  <section id="abaPainel">
+    <h2 class="sec">CONFIRMAÇÕES</h2>
+    <div class="cards" id="cardsRsvp"></div>
+    <h2 class="sec">PRESENTES</h2>
+    <div class="cards" id="cardsPresentes"></div>
+
+    <h2 class="sec">QUEM JÁ ESCOLHEU PRESENTE</h2>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Quem</th><th>Presente</th><th class="some">Quando</th></tr></thead>
+        <tbody id="corpoEscolhidos"></tbody>
+      </table>
+    </div>
+
+    <h2 class="sec">ÚLTIMAS CONFIRMAÇÕES</h2>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Convidado</th><th>Resposta</th><th class="some">Preenchido por</th><th class="some">Quando</th></tr></thead>
+        <tbody id="corpoRsvp"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---- Convidados ---- -->
+  <section id="abaConvidados" style="display:none">
+    <div class="barra">
+      <input id="buscaConv" class="campo" type="text" placeholder="Buscar convidado..." oninput="renderConvidados()">
+      <select id="filtroLista" class="campo" onchange="renderConvidados()">
+        <option value="">Todos os status</option>
+        <option value="Verde">Verde (aparece no site)</option>
+        <option value="Amarelo">Amarelo</option>
+        <option value="Vermelho">Vermelho</option>
+        <option value="(sem)">Sem status</option>
+      </select>
+      <select id="filtroPres" class="campo" onchange="renderConvidados()">
+        <option value="">Confirmados e pendentes</option>
+        <option value="vai">Só quem vai</option>
+        <option value="nao_vai">Só quem não vai</option>
+        <option value="pendente">Só pendentes</option>
+      </select>
+      <button class="btn" onclick="editarConvidado(null)">+ Novo convidado</button>
+      <span class="cont" id="contConv"></span>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr>
+          <th>Nome</th><th class="some">Grupo</th><th class="some">Origem</th>
+          <th>Status</th><th>Presença</th><th></th>
+        </tr></thead>
+        <tbody id="corpoConvidados"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ---- Presentes ---- -->
+  <section id="abaPresentes" style="display:none">
+    <div class="barra">
+      <input id="buscaPres" class="campo" type="text" placeholder="Buscar presente..." oninput="renderPresentes()">
+      <select id="filtroRes" class="campo" onchange="renderPresentes()">
+        <option value="">Todos</option>
+        <option value="livre">Só disponíveis</option>
+        <option value="reservado">Só escolhidos</option>
+      </select>
+      <button class="btn" onclick="editarPresente(null)">+ Novo presente</button>
+      <span class="cont" id="contPres"></span>
+    </div>
+    <div class="tabela">
+      <table>
+        <thead><tr>
+          <th>Presente</th><th class="some">Preço</th><th class="some">Link</th>
+          <th>Quem escolheu</th><th></th>
+        </tr></thead>
+        <tbody id="corpoPresentes"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ================= MODAIS ================= -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalCorpo"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://jqufnwvnsegceftsotfa.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdWZud3Zuc2VnY2VmdHNvdGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDcyNjQsImV4cCI6MjEwMDgyMzI2NH0.zc5Exs8aRWE1od6EdJSDmQTobLnQwl50dl4pPuvw8bw";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let convidados = [], presentes = [], grupos = [];
+
+const esc = s => (s==null?'':String(s)).replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast = m => { const t=document.getElementById('toast');
+  t.textContent=m; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'), 3000); };
+const dataBR = s => s ? new Date(s).toLocaleString('pt-BR',
+  {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+const reais = v => v==null ? '—' : 'R$ ' + Number(v).toLocaleString('pt-BR',
+  {minimumFractionDigits:2, maximumFractionDigits:2});
+
+/* ==================== LOGIN ==================== */
+/* A senha nunca fica neste arquivo: quem confere e o servidor do Supabase.
+   Sem sessao valida, o banco recusa qualquer escrita fora de reservar/confirmar. */
+document.getElementById('formLogin').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('btnEntrar');
+  const err = document.getElementById('erroLogin');
+  btn.disabled = true; btn.textContent = 'Entrando...'; err.textContent = '';
+  const { error } = await db.auth.signInWithPassword({
+    email: document.getElementById('email').value.trim(),
+    password: document.getElementById('senha').value
+  });
+  btn.disabled = false; btn.textContent = 'Entrar';
+  if(error){
+    err.textContent = /invalid/i.test(error.message)
+      ? 'E-mail ou senha incorretos.' : error.message;
+    return;
+  }
+  document.getElementById('senha').value = '';
+  await abrirPainel();
+});
+
+async function abrirPainel(){
+  const { data:{ session } } = await db.auth.getSession();
+  if(!session) return;
+  document.getElementById('telaLogin').style.display = 'none';
+  document.getElementById('telaAdmin').style.display = 'block';
+  document.getElementById('quemLogado').textContent = session.user.email;
+  await carregarTudo();
+}
+async function sair(){
+  await db.auth.signOut();
+  location.reload();
+}
+
+/* ==================== DADOS ==================== */
+async function carregarTudo(){
+  const [c, p, g] = await Promise.all([
+    db.from('guests').select('*').order('nome'),
+    db.from('gifts').select('*').order('nome'),
+    db.from('guest_groups').select('*').order('id')
+  ]);
+  if(c.error || p.error || g.error){
+    toast('Erro ao carregar: ' + (c.error||p.error||g.error).message); return;
+  }
+  convidados = c.data; presentes = p.data; grupos = g.data;
+  renderPainel(); renderConvidados(); renderPresentes();
+}
+
+function mostrarAba(nome){
+  ['painel','convidados','presentes'].forEach(a=>{
+    document.getElementById('aba'+a[0].toUpperCase()+a.slice(1)).style.display = a===nome?'block':'none';
+    document.querySelector('.aba[data-aba="'+a+'"]').classList.toggle('on', a===nome);
+  });
+}
+
+/* ==================== PAINEL ==================== */
+function renderPainel(){
+  const verdes = convidados.filter(c=>c.lista==='Verde');
+  const vao = verdes.filter(c=>c.presenca==='vai').length;
+  const nao = verdes.filter(c=>c.presenca==='nao_vai').length;
+  const pend = verdes.length - vao - nao;
+  document.getElementById('cardsRsvp').innerHTML =
+      card(vao,'VÃO COMPARECER','verde')
+    + card(nao,'NÃO VÃO','vermelho')
+    + card(pend,'AINDA NÃO RESPONDERAM','')
+    + card(verdes.length,'CONVIDADOS NO SITE','');
+
+  const esc_ = presentes.filter(p=>p.reservado_por);
+  const total = presentes.reduce((s,p)=>s+Number(p.preco||0),0);
+  const totalEsc = esc_.reduce((s,p)=>s+Number(p.preco||0),0);
+  document.getElementById('cardsPresentes').innerHTML =
+      card(esc_.length,'JÁ ESCOLHIDOS','verde')
+    + card(presentes.length-esc_.length,'AINDA DISPONÍVEIS','')
+    + card(reais(totalEsc),'VALOR JÁ PRESENTEADO','')
+    + card(reais(total),'VALOR TOTAL DA LISTA','');
+
+  const ordenados = [...esc_].sort((a,b)=>(b.reservado_em||'').localeCompare(a.reservado_em||''));
+  document.getElementById('corpoEscolhidos').innerHTML = ordenados.length
+    ? ordenados.map(p=>'<tr><td><b>'+esc(p.reservado_por)+'</b></td><td>'+esc(p.nome)
+        +'</td><td class="some sub">'+dataBR(p.reservado_em)+'</td></tr>').join('')
+    : '<tr><td colspan="3" class="vazio">Ninguém escolheu presente ainda.</td></tr>';
+
+  const resp = convidados.filter(c=>c.presenca)
+    .sort((a,b)=>(b.rsvp_em||'').localeCompare(a.rsvp_em||''));
+  document.getElementById('corpoRsvp').innerHTML = resp.length
+    ? resp.map(c=>'<tr><td>'+esc(c.nome)+'</td><td>'+tagPresenca(c.presenca)
+        +'</td><td class="some sub">'+esc(c.confirmado_por||'—')
+        +'</td><td class="some sub">'+dataBR(c.rsvp_em)+'</td></tr>').join('')
+    : '<tr><td colspan="4" class="vazio">Nenhuma confirmação ainda.</td></tr>';
+}
+const card = (n,r,cls) => '<div class="card '+cls+'"><div class="n">'+n+'</div><div class="r">'+r+'</div></div>';
+const tagPresenca = p => p==='vai' ? '<span class="tag vai">Vai</span>'
+                       : p==='nao_vai' ? '<span class="tag naovai">Não vai</span>'
+                       : '<span class="tag pend">Pendente</span>';
+
+/* ==================== CONVIDADOS ==================== */
+function renderConvidados(){
+  const q = document.getElementById('buscaConv').value.trim().toLowerCase();
+  const fl = document.getElementById('filtroLista').value;
+  const fp = document.getElementById('filtroPres').value;
+  let lista = convidados.filter(c=>{
+    if(q && !c.nome.toLowerCase().includes(q)) return false;
+    if(fl === '(sem)' && c.lista) return false;
+    if(fl && fl !== '(sem)' && c.lista !== fl) return false;
+    if(fp === 'pendente' && c.presenca) return false;
+    if(fp && fp !== 'pendente' && c.presenca !== fp) return false;
+    return true;
+  });
+  document.getElementById('contConv').textContent = lista.length + ' de ' + convidados.length;
+  document.getElementById('corpoConvidados').innerHTML = lista.length ? lista.map(c=>{
+    const comp = c.grupo_id
+      ? convidados.filter(x=>x.grupo_id===c.grupo_id && x.id!==c.id).map(x=>x.nome)
+      : [];
+    return '<tr>'
+      + '<td><b>'+esc(c.nome)+'</b>'
+        + (comp.length ? '<div class="sub">com '+esc(comp.join(', '))+'</div>' : '')+'</td>'
+      + '<td class="some">'+(c.grupo_id || '—')+'</td>'
+      + '<td class="some sub">'+esc(c.origem||'—')+' · '+esc(c.categoria||'—')+'</td>'
+      + '<td>'+(c.lista ? '<span class="tag '+esc(c.lista)+'">'+esc(c.lista)+'</span>'
+                        : '<span class="tag pend">—</span>')+'</td>'
+      + '<td>'+tagPresenca(c.presenca)+'</td>'
+      + '<td><div class="acoes">'
+        + '<button class="mini" onclick="editarConvidado('+c.id+')">Editar</button>'
+        + (c.presenca
+            ? '<button class="mini" onclick="limparRsvp('+c.id+')">Desfazer resposta</button>'
+            : '<button class="mini" onclick="marcarPresenca('+c.id+',\'vai\')">Vai</button>'
+              +'<button class="mini" onclick="marcarPresenca('+c.id+',\'nao_vai\')">Não vai</button>')
+        + '<button class="mini perigo" onclick="excluirConvidado('+c.id+')">Excluir</button>'
+      + '</div></td></tr>';
+  }).join('') : '<tr><td colspan="6" class="vazio">Nenhum convidado com esses filtros.</td></tr>';
+}
+
+function editarConvidado(id){
+  const c = id ? convidados.find(x=>x.id===id) : {nome:'',origem:'Daniel',categoria:'Família',lista:'Verde',grupo_id:''};
+  const opcoesGrupo = ['<option value="">Sem grupo</option>']
+    .concat(grupos.map(g=>{
+      const membros = convidados.filter(x=>x.grupo_id===g.id).map(x=>x.nome).join(', ');
+      return '<option value="'+g.id+'"'+(c.grupo_id===g.id?' selected':'')+'>'
+           + g.id + (membros ? ' — '+esc(membros.slice(0,45)) : '') + '</option>';
+    })).join('');
+  abrirModal(
+    (id?'Editar convidado':'Novo convidado'),
+    '<label>Nome</label><input id="f_nome" class="campo" value="'+esc(c.nome)+'">'
+    + '<label>Origem</label><select id="f_origem" class="campo">'
+      + opt(['Daniel','Danielle'], c.origem) + '</select>'
+    + '<label>Categoria</label><select id="f_cat" class="campo">'
+      + opt(['Família','Amigos'], c.categoria) + '</select>'
+    + '<label>Status (só "Verde" aparece no site)</label><select id="f_lista" class="campo">'
+      + opt(['Verde','Amarelo','Vermelho'], c.lista) + '</select>'
+    + '<label>Grupo (quem confirma presença junto)</label>'
+      + '<select id="f_grupo" class="campo">'+opcoesGrupo+'</select>'
+      + '<div class="sub" style="margin-top:6px">Para criar um grupo novo, use o número seguinte ao último da lista.</div>',
+    async () => {
+      const nome = document.getElementById('f_nome').value.trim();
+      if(!nome){ toast('O nome é obrigatório'); return false; }
+      const dados = {
+        nome,
+        origem: document.getElementById('f_origem').value,
+        categoria: document.getElementById('f_cat').value,
+        lista: document.getElementById('f_lista').value,
+        grupo_id: document.getElementById('f_grupo').value || null
+      };
+      const r = id ? await db.from('guests').update(dados).eq('id', id)
+                   : await db.from('guests').insert(dados);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast(id ? 'Convidado atualizado' : 'Convidado adicionado');
+      await carregarTudo(); return true;
+    });
+}
+const opt = (vals, sel) => vals.map(v=>'<option'+(v===sel?' selected':'')+'>'+v+'</option>').join('');
+
+async function marcarPresenca(id, p){
+  const c = convidados.find(x=>x.id===id);
+  const r = await db.from('guests').update({
+    presenca:p, rsvp_em:new Date().toISOString(), confirmado_por:'Anotado pelo casal'
+  }).eq('id', id);
+  if(r.error){ toast('Erro: '+r.error.message); return; }
+  toast(c.nome + ' → ' + (p==='vai'?'Vai':'Não vai'));
+  await carregarTudo();
+}
+async function limparRsvp(id){
+  const c = convidados.find(x=>x.id===id);
+  confirmar('Desfazer resposta',
+    'A resposta de <b>'+esc(c.nome)+'</b> volta a ficar pendente, e essa pessoa reaparece '
+    + 'na busca do site para confirmar de novo.',
+    async () => {
+      const r = await db.from('guests')
+        .update({presenca:null, rsvp_em:null, confirmado_por:null}).eq('id', id);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast('Resposta desfeita'); await carregarTudo(); return true;
+    });
+}
+async function excluirConvidado(id){
+  const c = convidados.find(x=>x.id===id);
+  confirmar('Excluir convidado',
+    'Vai apagar <b>'+esc(c.nome)+'</b> de vez. Não dá para desfazer.'
+    + '<div class="aviso">Se a ideia é só tirar do site, prefira editar e mudar o status '
+    + 'para Vermelho — assim o nome continua guardado.</div>',
+    async () => {
+      const r = await db.from('guests').delete().eq('id', id);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast('Convidado excluído'); await carregarTudo(); return true;
+    });
+}
+
+/* ==================== PRESENTES ==================== */
+function renderPresentes(){
+  const q = document.getElementById('buscaPres').value.trim().toLowerCase();
+  const f = document.getElementById('filtroRes').value;
+  let lista = presentes.filter(p=>{
+    if(q && !p.nome.toLowerCase().includes(q)) return false;
+    if(f === 'livre' && p.reservado_por) return false;
+    if(f === 'reservado' && !p.reservado_por) return false;
+    return true;
+  });
+  document.getElementById('contPres').textContent = lista.length + ' de ' + presentes.length;
+  document.getElementById('corpoPresentes').innerHTML = lista.length ? lista.map(p=>'<tr>'
+    + '<td><b>'+esc(p.nome)+'</b></td>'
+    + '<td class="some">'+reais(p.preco)+'</td>'
+    + '<td class="some">'+(p.link
+        ? '<a href="'+esc(p.link)+'" target="_blank" rel="noopener" style="color:var(--vinho)">abrir</a>'
+        : '<span class="sub">—</span>')+'</td>'
+    + '<td>'+(p.reservado_por
+        ? '<b style="color:var(--vinho)">'+esc(p.reservado_por)+'</b><div class="sub">'
+          + dataBR(p.reservado_em)+'</div>'
+        : '<span class="tag pend">disponível</span>')+'</td>'
+    + '<td><div class="acoes">'
+      + '<button class="mini" onclick="editarPresente('+p.id+')">Editar</button>'
+      + (p.reservado_por
+          ? '<button class="mini" onclick="liberarPresente('+p.id+')">Liberar</button>'
+          : '<button class="mini" onclick="reservarManual('+p.id+')">Marcar quem deu</button>')
+      + '<button class="mini perigo" onclick="excluirPresente('+p.id+')">Excluir</button>'
+    + '</div></td></tr>').join('')
+    : '<tr><td colspan="5" class="vazio">Nenhum presente com esses filtros.</td></tr>';
+}
+
+function editarPresente(id){
+  const p = id ? presentes.find(x=>x.id===id) : {nome:'',preco:'',link:'',quantidade:1};
+  abrirModal(
+    (id?'Editar presente':'Novo presente'),
+    '<label>Nome</label><input id="g_nome" class="campo" value="'+esc(p.nome)+'">'
+    + '<label>Preço aproximado (usado no filtro de faixa)</label>'
+      + '<input id="g_preco" class="campo" type="number" step="0.01" value="'+(p.preco??'')+'">'
+    + '<label>Link de sugestão (opcional)</label>'
+      + '<input id="g_link" class="campo" value="'+esc(p.link||'')+'">'
+    + (id ? '' : '<label>Quantas unidades vocês precisam?</label>'
+        + '<input id="g_qtd" class="campo" type="number" min="1" max="20" value="1">'
+        + '<div class="sub" style="margin-top:6px">Cria uma linha por unidade, '
+        + 'para várias pessoas poderem presentear o mesmo item.</div>'),
+    async () => {
+      const nome = document.getElementById('g_nome').value.trim();
+      if(!nome){ toast('O nome é obrigatório'); return false; }
+      const preco = document.getElementById('g_preco').value;
+      const dados = {
+        nome,
+        preco: preco === '' ? null : Number(preco),
+        link: document.getElementById('g_link').value.trim() || null
+      };
+      let r;
+      if(id){
+        r = await db.from('gifts').update(dados).eq('id', id);
+      } else {
+        const n = Math.min(20, Math.max(1, Number(document.getElementById('g_qtd').value)||1));
+        r = await db.from('gifts').insert(
+          Array.from({length:n}, ()=>({...dados, quantidade:1})));
+      }
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast(id ? 'Presente atualizado' : 'Presente adicionado');
+      await carregarTudo(); return true;
+    });
+}
+
+function reservarManual(id){
+  const p = presentes.find(x=>x.id===id);
+  abrirModal('Quem deu este presente?',
+    '<div class="sub" style="margin-bottom:10px">'+esc(p.nome)+'</div>'
+    + '<label>Nome de quem presenteou</label><input id="r_nome" class="campo" value="">'
+    + '<div class="sub" style="margin-top:6px">O item continua na lista, com esse nome '
+    + 'e sem o botão de presentear.</div>',
+    async () => {
+      const nome = document.getElementById('r_nome').value.trim();
+      if(!nome){ toast('Digite o nome'); return false; }
+      const r = await db.from('gifts')
+        .update({reservado_por:nome, reservado_em:new Date().toISOString()}).eq('id', id);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast('Marcado como presenteado por '+nome);
+      await carregarTudo(); return true;
+    });
+}
+function liberarPresente(id){
+  const p = presentes.find(x=>x.id===id);
+  confirmar('Liberar presente',
+    '<b>'+esc(p.nome)+'</b> volta a ficar disponível e some o nome de <b>'
+    + esc(p.reservado_por)+'</b>.',
+    async () => {
+      const r = await db.from('gifts')
+        .update({reservado_por:null, reservado_em:null}).eq('id', id);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast('Presente liberado'); await carregarTudo(); return true;
+    });
+}
+function excluirPresente(id){
+  const p = presentes.find(x=>x.id===id);
+  confirmar('Excluir presente',
+    'Vai apagar <b>'+esc(p.nome)+'</b> da lista. Não dá para desfazer.'
+    + (p.reservado_por ? '<div class="aviso">Atenção: <b>'+esc(p.reservado_por)
+        +'</b> já escolheu este presente. Apagar faz essa escolha sumir do controle de vocês.</div>' : ''),
+    async () => {
+      const r = await db.from('gifts').delete().eq('id', id);
+      if(r.error){ toast('Erro: '+r.error.message); return false; }
+      toast('Presente excluído'); await carregarTudo(); return true;
+    });
+}
+
+/* ==================== MODAL ==================== */
+let aoSalvar = null;
+function abrirModal(titulo, html, salvar){
+  aoSalvar = salvar;
+  document.getElementById('modalCorpo').innerHTML =
+    '<h3>'+titulo+'</h3>' + html
+    + '<div class="linha"><button class="btn-sec" onclick="fecharModal()">Cancelar</button>'
+    + '<button class="btn" id="btnSalvar">Salvar</button></div>';
+  document.getElementById('btnSalvar').onclick = executarSalvar;
+  document.getElementById('overlay').classList.add('on');
+}
+function confirmar(titulo, html, acao){
+  aoSalvar = acao;
+  document.getElementById('modalCorpo').innerHTML =
+    '<h3>'+titulo+'</h3><div style="font-size:13.5px; line-height:1.6">'+html+'</div>'
+    + '<div class="linha"><button class="btn-sec" onclick="fecharModal()">Cancelar</button>'
+    + '<button class="btn" id="btnSalvar">Confirmar</button></div>';
+  document.getElementById('btnSalvar').onclick = executarSalvar;
+  document.getElementById('overlay').classList.add('on');
+}
+async function executarSalvar(){
+  const b = document.getElementById('btnSalvar');
+  b.disabled = true; b.textContent = 'Salvando...';
+  const ok = await aoSalvar();
+  b.disabled = false; b.textContent = 'Salvar';
+  if(ok !== false) fecharModal();
+}
+function fecharModal(){ document.getElementById('overlay').classList.remove('on'); aoSalvar = null; }
+document.getElementById('overlay').addEventListener('click', e => {
+  if(e.target.id === 'overlay') fecharModal();
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape') fecharModal(); });
+
+/* Se ja existe sessao salva, entra direto */
+abrirPainel();
+</script>
+</body>
+</html>
