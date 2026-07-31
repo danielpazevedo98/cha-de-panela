@@ -422,6 +422,27 @@ function setTg(btn, vai){
   wrap.querySelector('.vai').classList.toggle('on', vai===1);
   wrap.querySelector('.nao').classList.toggle('on', vai===0);
 }
+/* A mensagem final precisa refletir o que foi marcado: so "presencas confirmadas"
+   soava errado para quem respondeu que nao vai. */
+function mensagemRsvp(updates){
+  const vao = updates.filter(u => u.presenca === 'vai').length;
+  const nao = updates.length - vao;
+  const festa = ' ' + String.fromCodePoint(0x1F389);
+  const plural = (n, um, muitos) => n + ' ' + (n === 1 ? um : muitos);
+  if(vao && nao){
+    return plural(vao,'presença confirmada','presenças confirmadas') + ' e '
+         + plural(nao,'ausência registrada','ausências registradas') + '. Obrigado por avisar!';
+  }
+  if(vao){
+    return (vao === 1 ? 'Presença confirmada.'
+                      : plural(vao,'presença confirmada','presenças confirmadas') + '.')
+         + ' Até lá!' + festa;
+  }
+  return (nao === 1 ? 'Resposta registrada. Vamos sentir sua falta!'
+                    : plural(nao,'ausência registrada','ausências registradas')
+                      + '. Vamos sentir falta de vocês!');
+}
+
 async function confirmarRsvp(btn){
   const linhas = [...document.querySelectorAll('#grupo .membro')];
   const updates = [];
@@ -446,9 +467,7 @@ async function confirmarRsvp(btn){
   btn.disabled=false; btn.textContent='Confirmar presença';
   await loadGuests();
   if(falhas){ toast('Não consegui salvar tudo. Tente de novo, por favor'); return; }
-  const n = updates.length;
-  toast(n===1 ? 'Presença confirmada. Até lá! ' + String.fromCodePoint(0x1F389)
-              : n + ' presenças confirmadas. Até lá! ' + String.fromCodePoint(0x1F389));
+  toast(mensagemRsvp(updates));
   document.getElementById('grupo').style.display='none';
   document.getElementById('rsvpNome').value='';
 }
